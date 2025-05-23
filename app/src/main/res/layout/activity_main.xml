@@ -13,14 +13,14 @@
         android:layout_marginTop="32dp"
         android:fontFamily="monospace"
         android:gravity="center"
-        android:text="00:00:00:00"
+        android:text="00:00:00"
         android:textColor="@color/black"
         android:textSize="56sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="01:23:45:67" />
+        tools:text="23:45:67" />
 
     <TextView
         android:id="@+id/tv_current_lap_time"
@@ -29,13 +29,13 @@
         android:layout_marginTop="8dp"
         android:fontFamily="monospace"
         android:gravity="center"
-        android:text="Lap: 00:00:00:00"
+        android:text="Lap: 00:00:00"
         android:textColor="#5A5A5A"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_total_time"
-        tools:text="Lap: 00:00:05:12" />
+        tools:text="Lap: 00:05:12" />
 
     <LinearLayout
         android:id="@+id/button_container"

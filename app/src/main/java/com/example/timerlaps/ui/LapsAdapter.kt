@@ -42,12 +42,11 @@ class LapsAdapter(private val laps: MutableList<Lap>) : RecyclerView.Adapter<Lap
 
     // Helper function to format milliseconds into HH:MM:SS:ms
     private fun formatTime(millis: Long): String {
-        val hours = (millis / (1000 * 60 * 60)) % 24
         val minutes = (millis / (1000 * 60)) % 60
         val seconds = (millis / 1000) % 60
         val hundredths = (millis % 1000) / 10 // Get hundredths of a second
 
-        return String.format("%02d:%02d:%02d:%02d", hours, minutes, seconds, hundredths)
+        return String.format("%02d:%02d:%02d", minutes, seconds, hundredths)
     }
 
     fun addLap(lap: Lap) {
