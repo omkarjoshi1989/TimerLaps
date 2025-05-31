@@ -13,7 +13,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Lap 1"
-        android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -25,7 +24,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:fontFamily="monospace"
-        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@+id/tv_lap_number"
         app:layout_constraintTop_toTopOf="parent" />
@@ -37,7 +35,6 @@
         android:layout_marginStart="32dp"
         android:fontFamily="monospace"
         android:textColor="#5A5A5A"
-        android:textSize="16sp"
         app:layout_constraintLeft_toRightOf="@+id/tv_lap_time_duration"
         app:layout_constraintTop_toTopOf="parent" />
 

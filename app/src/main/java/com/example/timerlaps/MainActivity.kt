@@ -121,7 +121,7 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         lapNumberCounter = 0
 
         tvTotalTime.text = formatTime(0)
-        tvCurrentLapTime.text = "Lap: ${formatTime(0)}"
+        tvCurrentLapTime.text = "Lap ${formatTime(0)}"
 
         lapsAdapter.clearLaps()
         updateButtonStates(false)
@@ -178,7 +178,7 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         val seconds = (millis / 1000) % 60
         val hundredths = (millis % 1000) / 10 // Get hundredths of a second
 
-        return String.format("%02d:%02d:%02d", minutes, seconds, hundredths)
+        return String.format("Time: %02d:%02d:%02d", minutes, seconds, hundredths)
     }
 
     // Text-to-Speech Initialization
