@@ -26,7 +26,7 @@ class LapsAdapter(private val laps: MutableList<Lap>) : RecyclerView.Adapter<Lap
         // We want to show laps in reverse order (newest at top)
         val lap = laps[laps.size - 1 - position] // Access from end of list
 
-        holder.tvLapNumber.text = "Lap ${lap.lapNumber}"
+        holder.tvLapNumber.text = "Namaskar ${lap.lapNumber}"
         holder.tvLapTimeDuration.text = formatTime(lap.lapDurationMillis)
         holder.tvLapTotalTime.text = formatTime(lap.totalTimeAtLapMillis)
 

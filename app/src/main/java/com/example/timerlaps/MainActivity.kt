@@ -8,11 +8,16 @@ import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.timerlaps.ui.LapsAdapter
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
+import kotlin.text.format
 
 class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
@@ -22,29 +27,25 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private lateinit var btnLap: Button
     private lateinit var btnPauseResume: Button
     private lateinit var rvLaps: RecyclerView
-
     private var tts: TextToSpeech? = null
-
     private val handler = Handler(Looper.getMainLooper())
     private lateinit var timerRunnable: Runnable
-
     private var isRunning = false
     private var startTimeMillis: Long = 0 // When the timer officially started or resumed
     private var timeWhenPausedMillis: Long = 0 // Time accumulated when timer was paused
-
     private var currentLapStartTimeMillis: Long = 0 // When the current lap started
     private var lapNumberCounter = 0 // Tracks the number of laps recorded
-
     private val lapList = mutableListOf<Lap>()
     private lateinit var lapsAdapter: LapsAdapter
+    private lateinit var tvDateTime: TextView
+    private val handlerCurrentDateTime = Handler(Looper.getMainLooper())
+    private lateinit var dateTimeRunnable: Runnable
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         // Initialize Text-to-Speech
         tts = TextToSpeech(this, this)
-
         // Initialize UI components
         tvTotalTime = findViewById(R.id.tv_total_time)
         tvCurrentLapTime = findViewById(R.id.tv_current_lap_time)
@@ -52,7 +53,6 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         btnLap = findViewById(R.id.btn_lap)
         btnPauseResume = findViewById(R.id.btn_pause_resume)
         rvLaps = findViewById(R.id.rv_laps)
-
         // Set up RecyclerView
         lapsAdapter = LapsAdapter(lapList)
         rvLaps.layoutManager = LinearLayoutManager(this).apply {
@@ -61,7 +61,6 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             reverseLayout = true
         }
         rvLaps.adapter = lapsAdapter
-
         // Initialize timer runnable
         timerRunnable = object : Runnable {
             override fun run() {
@@ -69,7 +68,7 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                 tvTotalTime.text = formatTime(totalElapsedMillis)
 
                 val currentLapElapsedMillis = SystemClock.uptimeMillis() - currentLapStartTimeMillis
-                tvCurrentLapTime.text = "Lap: ${formatTime(currentLapElapsedMillis)}"
+                tvCurrentLapTime.text = "Namaskar ${formatTime(currentLapElapsedMillis)}"
 
                 handler.postDelayed(this, 10) // Update every 10 milliseconds
             }
@@ -90,6 +89,28 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
         // Initial state of buttons
         updateButtonStates(false)
+
+        tvDateTime = findViewById(R.id.tv_date_time)
+        // Define the runnable to update the date and time
+        dateTimeRunnable = object : Runnable {
+            override fun run() {
+                // Get current date and time
+                val sdf = SimpleDateFormat("dd/MM/yyyy hh:mm:ss", Locale.getDefault())
+                val currentDateAndTime: String = sdf.format(Date())
+                // Update the TextView
+                tvDateTime.text = currentDateAndTime
+                // Schedule the runnable to run again after 1 second
+                handler.postDelayed(this, 1000)
+            }
+        }
+        val onBackPressedCallback = object : OnBackPressedCallback(true /* enabled by default */) {
+            override fun handleOnBackPressed() {
+                // Your custom back press logic here.
+                // For example, show a Toast message instead of finishing the activity.
+                Toast.makeText(this@MainActivity, "Back press is disabled here!", Toast.LENGTH_SHORT).show()
+            }
+        }
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
     }
 
     private fun startTimer() {
@@ -114,15 +135,12 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private fun resetTimer() {
         isRunning = false
         handler.removeCallbacks(timerRunnable)
-
         startTimeMillis = 0
         timeWhenPausedMillis = 0
         currentLapStartTimeMillis = 0
         lapNumberCounter = 0
-
         tvTotalTime.text = formatTime(0)
-        tvCurrentLapTime.text = "Lap ${formatTime(0)}"
-
+        tvCurrentLapTime.text = "Namaskar ${formatTime(0)}"
         lapsAdapter.clearLaps()
         updateButtonStates(false)
     }
@@ -139,15 +157,12 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             // Record the current lap
             val currentLapDuration = SystemClock.uptimeMillis() - currentLapStartTimeMillis
             val totalTimeAtThisLap = SystemClock.uptimeMillis() - startTimeMillis + timeWhenPausedMillis
-
             val newLap = Lap(lapNumberCounter, currentLapDuration, totalTimeAtThisLap)
             lapsAdapter.addLap(newLap)
             rvLaps.scrollToPosition(0) // Scroll to the newest lap
-
             lapNumberCounter++ // Increment for the next lap
             // Reset current lap timer for the next lap
             currentLapStartTimeMillis = SystemClock.uptimeMillis()
-
             speakLapCompletion(lapNumberCounter) // Speak the number of the *new* lap starting
         }
     }
@@ -177,7 +192,6 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         val minutes = (millis / (1000 * 60)) % 60
         val seconds = (millis / 1000) % 60
         val hundredths = (millis % 1000) / 10 // Get hundredths of a second
-
         return String.format("Time: %02d:%02d:%02d", minutes, seconds, hundredths)
     }
 
@@ -185,7 +199,6 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     override fun onInit(status: Int) {
         if (status == TextToSpeech.SUCCESS) {
             val result = tts?.setLanguage(Locale.US) // Set your desired language
-
             if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                 Log.e("TTS", "The Language specified is not supported!")
             } else {
@@ -198,7 +211,7 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
     private fun speakLapCompletion(lapNumber: Int) {
         if (tts != null && tts?.isSpeaking == false) {
-            val text = "Starting Lap $lapNumber" // Announce the new lap that has just begun
+            val text = "Namaskar $lapNumber starts" // Announce the new lap that has just begun
             tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "")
         }
     }
@@ -234,5 +247,18 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         // Stop the handler callbacks to prevent memory leaks
         handler.removeCallbacks(timerRunnable)
         super.onDestroy()
+        handlerCurrentDateTime.removeCallbacks(dateTimeRunnable)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Start the updates when the activity is resumed
+        handler.post(dateTimeRunnable)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // Stop the updates when the activity is paused to save resources
+        handler.removeCallbacks(dateTimeRunnable)
     }
 }
